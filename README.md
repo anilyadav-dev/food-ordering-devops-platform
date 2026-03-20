@@ -20,11 +20,13 @@ This project helps to learn how to:
 ## 🧱 Tech Stack
 
 ### Application
+
 - Frontend: React (Coming soon)
 - Backend: Node.js + Express (Coming soon)
 - Database: MongoDB (Docker)
 
 ### DevOps Tools
+
 - Docker
 - Kubernetes (kind)
 - Git & GitHub
@@ -37,14 +39,14 @@ This project helps to learn how to:
 ## 📁 Project Structure
 
 app/
-  frontend/
-  backend/
+frontend/
+backend/
 
 infra/
-  docker/
-  k8s/
-  terraform/
-  ansible/
+docker/
+k8s/
+terraform/
+ansible/
 
 scripts/
 docs/
@@ -86,10 +88,10 @@ Logs script added
 - Express server setup
 - MongoDB connected using Mongoose
 - Project structured with MVC pattern:
-  - models/
-  - routes/
-  - controllers/
-  - config/
+    - models/
+    - routes/
+    - controllers/
+    - config/
 - User model created
 - Create User API implemented
 
@@ -121,6 +123,14 @@ npm run dev
 ✔ MongoDB connected
 ✔ API working
 
+## 🔐 Day 3 — Authentication System
+
+- Register API implemented
+- Login API implemented
+- Password hashing using bcrypt
+- JWT authentication implemented
+
 ## 👨‍💻 Author
 
 Anil Yadav
+```
