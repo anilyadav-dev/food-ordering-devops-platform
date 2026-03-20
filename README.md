@@ -79,6 +79,48 @@ Logs script added
 
 ---
 
+## 🔥 Day 2 — Backend Setup
+
+### ✅ Features Implemented
+
+- Express server setup
+- MongoDB connected using Mongoose
+- Project structured with MVC pattern:
+  - models/
+  - routes/
+  - controllers/
+  - config/
+- User model created
+- Create User API implemented
+
+### 📡 API Endpoint
+
+#### Create User
+
+POST /api/users
+
+Example request:
+
+```bash
+curl -X POST http://localhost:8080/api/users \
+-H "Content-Type: application/json" \
+-d '{"name":"Anil","email":"anil@example.com","password":"123456"}'
+🗄️ Database
+
+MongoDB running via Docker
+
+Database name: food_ordering_devops
+
+▶️ Run Backend
+cd app/backend
+npm run dev
+📌 Status
+
+✅ Day 2 Completed
+✔ Backend running
+✔ MongoDB connected
+✔ API working
+
 ## 👨‍💻 Author
 
 Anil Yadav
