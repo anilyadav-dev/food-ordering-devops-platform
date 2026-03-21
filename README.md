@@ -106,7 +106,7 @@ Example request:
 ```bash
 curl -X POST http://localhost:8080/api/users \
 -H "Content-Type: application/json" \
--d '{"name":"Anil","email":"anil@example.com","password":"123456"}'
+-d '{"name":"testing","email":"testing@example.com","password":"123456"}'
 🗄️ Database
 
 MongoDB running via Docker
@@ -129,6 +129,67 @@ npm run dev
 - Login API implemented
 - Password hashing using bcrypt
 - JWT authentication implemented
+
+## 🍽️ Day 4 — Core Backend (Menu, Cart, Order)
+
+### ✅ Features Implemented
+
+#### 🥗 Menu APIs (CRUD)
+- Create menu item → `POST /api/menu`
+- Get all menu items → `GET /api/menu`
+- Update menu item → `PUT /api/menu/:id`
+- Delete menu item → `DELETE /api/menu/:id`
+
+#### 🛒 Cart APIs
+- Add item to cart → `POST /api/cart`
+- Get user cart → `GET /api/cart/:userId`
+- Supports quantity update
+- Uses MongoDB references
+- Populates menu item details
+
+#### 📦 Order APIs
+- Place order → `POST /api/orders`
+- Get user orders → `GET /api/orders/:userId`
+- Converts cart → order
+- Calculates total price automatically
+- Clears cart after order
+
+---
+
+### 🧠 Backend Architecture
+
+- MVC pattern (models, routes, controllers)
+- MongoDB relationships:
+  - User → Cart → Menu
+  - User → Order → Menu
+- Data population using `.populate()`
+- Clean API structure
+
+---
+
+### 🔐 Environment Variables
+
+Environment variables are used for secure configuration:
+
+
+PORT=8080
+MONGO_URI=mongodb://127.0.0.1:27017/food_ordering_devops
+JWT_SECRET=your_secret_key
+
+
+- Config loaded using `dotenv`
+- No hardcoded secrets in code
+
+---
+
+### 📌 Status
+
+✅ Day 4 Completed
+✔ Menu CRUD APIs working
+✔ Cart functionality working
+✔ Order system working
+✔ Full backend ready
+✔ Environment variables configured
 
 ## 👨‍💻 Author
 
