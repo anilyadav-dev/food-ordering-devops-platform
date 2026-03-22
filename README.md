@@ -191,6 +191,65 @@ JWT_SECRET=your_secret_key
 ✔ Full backend ready
 ✔ Environment variables configured
 
+---
+
+## 🎨 Day 5 — Frontend Setup
+
+### ✅ Features Implemented
+
+#### ⚛️ React Frontend
+- Frontend created using **Vite + React**
+- Clean project structure
+- Global styling with CSS
+
+#### 🔀 Routing
+- Home page → `/`
+- Login page → `/login`
+- Register page → `/register`
+
+#### 🔐 Auth UI
+- Register form UI
+- Login form UI
+- Styled auth pages
+- Logout button added
+
+#### 🔌 Frontend ↔ Backend Integration
+- Connected Register API using **axios**
+- Connected Login API using **axios**
+- Stored logged-in user in `localStorage`
+- Displayed login state on home page
+
+#### 🌐 API Communication
+- Backend CORS enabled
+- Frontend successfully talks to backend on localhost
+
+### ✅ Prettier (Code Formatting)
+- Configured Prettier for consistent code style
+- Automatically formats code across frontend and backend
+- Improves readability and team collaboration
+
+### 🐶 Husky (Git Hooks)
+- Husky installed for Git hooks
+- Pre-commit hook configured
+- Runs formatting checks before every commit
+
+### 🎯 Benefits
+- Prevents bad code formatting
+- Ensures clean and consistent commits
+- Improves code quality automatically
+
+
+### 📌 Status
+
+✅ Day 5 Completed
+✔ React app created
+✔ Routing working
+✔ Login/Register UI working
+✔ Auth API connected
+✔ Frontend and backend integrated
+✔ Code Quality
+
+
 ## 👨‍💻 Author
 
 Anil Yadav
