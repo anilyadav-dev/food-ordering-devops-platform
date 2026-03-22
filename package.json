@@ -1,0 +1,12 @@
+{
+  "name": "food-ordering-devops-platform",
+  "private": true,
+  "scripts": {
+    "prepare": "husky",
+    "format": "npm --prefix app/frontend run format && npm --prefix app/backend run format",
+    "format:check": "npm --prefix app/frontend run format:check && npm --prefix app/backend run format:check"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7"
+  }
+}

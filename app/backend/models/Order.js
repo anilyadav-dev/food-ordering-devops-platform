@@ -1,17 +1,17 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const orderSchema = new mongoose.Schema(
   {
     user: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: 'User',
       required: true,
     },
     items: [
       {
         menuItem: {
           type: mongoose.Schema.Types.ObjectId,
-          ref: "Menu",
+          ref: 'Menu',
           required: true,
         },
         quantity: {
@@ -26,7 +26,7 @@ const orderSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      default: "pending",
+      default: 'pending',
     },
   },
   {
@@ -34,4 +34,4 @@ const orderSchema = new mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model("Order", orderSchema);
+module.exports = mongoose.model('Order', orderSchema);

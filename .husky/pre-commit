@@ -1,0 +1,9 @@
+#!/bin/sh
+
+set -e
+
+echo "Running frontend pre-commit checks..."
+npm --prefix app/frontend run pre-commit
+
+echo "Running backend pre-commit checks..."
+npm --prefix app/backend run pre-commit

@@ -1,4 +1,4 @@
-const Cart = require("../models/Cart");
+const Cart = require('../models/Cart');
 
 const addToCart = async (req, res) => {
   try {
@@ -33,7 +33,9 @@ const addToCart = async (req, res) => {
 
 const getCart = async (req, res) => {
   try {
-    const cart = await Cart.findOne({ user: req.params.userId }).populate("items.menuItem");
+    const cart = await Cart.findOne({ user: req.params.userId }).populate(
+      'items.menuItem'
+    );
     res.json(cart);
   } catch (error) {
     res.status(500).json({ message: error.message });

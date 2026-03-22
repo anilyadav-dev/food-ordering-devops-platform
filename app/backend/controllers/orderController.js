@@ -1,14 +1,14 @@
-const Order = require("../models/Order");
-const Cart = require("../models/Cart");
+const Order = require('../models/Order');
+const Cart = require('../models/Cart');
 
 const placeOrder = async (req, res) => {
   try {
     const { user } = req.body;
 
-    const cart = await Cart.findOne({ user }).populate("items.menuItem");
+    const cart = await Cart.findOne({ user }).populate('items.menuItem');
 
     if (!cart || cart.items.length === 0) {
-      return res.status(400).json({ message: "Cart is empty" });
+      return res.status(400).json({ message: 'Cart is empty' });
     }
 
     const totalPrice = cart.items.reduce(
@@ -23,7 +23,7 @@ const placeOrder = async (req, res) => {
         quantity: item.quantity,
       })),
       totalPrice,
-      status: "pending",
+      status: 'pending',
     });
 
     await Cart.deleteOne({ user });
@@ -36,7 +36,9 @@ const placeOrder = async (req, res) => {
 
 const getOrders = async (req, res) => {
   try {
-    const orders = await Order.find({ user: req.params.userId }).populate("items.menuItem");
+    const orders = await Order.find({ user: req.params.userId }).populate(
+      'items.menuItem'
+    );
     res.json(orders);
   } catch (error) {
     res.status(500).json({ message: error.message });
