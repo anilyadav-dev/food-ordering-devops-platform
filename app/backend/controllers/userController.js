@@ -1,86 +1,60 @@
+const asyncHandler = require('../middleware/asyncHandler');
 const User = require('../models/User');
-const generateToken = require('../utils/generateToken');
+const buildUserResponse = require('../utils/buildUserResponse');
 
-const registerUser = async (req, res) => {
-  try {
-    const { name, email, password } = req.body;
+const registerUser = asyncHandler(async (req, res) => {
+  const { name, email, password } = req.body;
 
-    const userExists = await User.findOne({ email });
+  const userExists = await User.findOne({ email });
 
-    if (userExists) {
-      return res.status(400).json({ message: 'User already exists' });
-    }
-
-    const user = await User.create({
-      name,
-      email,
-      password,
-    });
-
-    res.status(201).json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      isAdmin: user.isAdmin,
-      token: generateToken(user._id),
-    });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+  if (userExists) {
+    res.status(400);
+    throw new Error('User already exists');
   }
-};
 
-const loginUser = async (req, res) => {
-  try {
-    const { email, password } = req.body;
+  const user = await User.create({
+    name,
+    email,
+    password,
+  });
 
-    const user = await User.findOne({ email });
+  res.status(201).json(buildUserResponse(user));
+});
 
-    if (user && (await user.matchPassword(password))) {
-      if (user.isAdmin) {
-        return res
-          .status(403)
-          .json({ message: 'Admins must use the admin login page' });
-      }
+const loginUser = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
 
-      res.json({
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        isAdmin: user.isAdmin,
-        token: generateToken(user._id),
-      });
-    } else {
-      res.status(401).json({ message: 'Invalid email or password' });
-    }
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+  const user = await User.findOne({ email });
+
+  if (!user || !(await user.matchPassword(password))) {
+    res.status(401);
+    throw new Error('Invalid email or password');
   }
-};
 
-const adminLoginUser = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-
-    const user = await User.findOne({ email });
-
-    if (user && (await user.matchPassword(password))) {
-      if (!user.isAdmin) {
-        return res.status(403).json({ message: 'Admin access only' });
-      }
-
-      res.json({
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        isAdmin: user.isAdmin,
-        token: generateToken(user._id),
-      });
-    } else {
-      res.status(401).json({ message: 'Invalid email or password' });
-    }
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+  if (user.isAdmin) {
+    res.status(403);
+    throw new Error('Admins must use the admin login page');
   }
-};
+
+  res.json(buildUserResponse(user));
+});
+
+const adminLoginUser = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+
+  const user = await User.findOne({ email });
+
+  if (!user || !(await user.matchPassword(password))) {
+    res.status(401);
+    throw new Error('Invalid email or password');
+  }
+
+  if (!user.isAdmin) {
+    res.status(403);
+    throw new Error('Admin access only');
+  }
+
+  res.json(buildUserResponse(user));
+});
 
 module.exports = { registerUser, loginUser, adminLoginUser };
