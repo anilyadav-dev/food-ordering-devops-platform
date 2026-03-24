@@ -1,7 +1,14 @@
 import { useState } from 'react';
-import axios from 'axios';
+import { useDispatch } from 'react-redux';
+import { useNavigate, Link } from 'react-router-dom';
+import api from '../utils/api';
+import { setCredentials } from '../features/auth/authSlice';
+import { isAdminEmail } from '../utils/auth';
 
 function RegisterPage() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -12,10 +19,7 @@ function RegisterPage() {
   const [error, setError] = useState('');
 
   const handleChange = (e) => {
-    setFormData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleSubmit = async (e) => {
@@ -25,17 +29,17 @@ function RegisterPage() {
     setError('');
 
     try {
-      const res = await axios.post('http://localhost:8080/api/users', formData);
-      console.log('Register response:', res.data);
+      const res = await api.post('/api/users', formData);
+      const payload = {
+        ...res.data,
+        isAdmin: isAdminEmail(res.data.email),
+      };
+
+      dispatch(setCredentials(payload));
       setMessage('Registration successful!');
-      setFormData({
-        name: '',
-        email: '',
-        password: '',
-      });
+      navigate('/');
     } catch (err) {
-      console.error('Register error:', err);
-      setError(err.response?.data?.message || 'Something went wrong');
+      setError(err.response?.data?.message || 'Registration failed');
     } finally {
       setLoading(false);
     }
@@ -48,7 +52,7 @@ function RegisterPage() {
           <p className="eyebrow">Create Account</p>
           <h2>Register</h2>
           <p className="auth-text">
-            Create your account to access the food ordering platform.
+            Create your account to access menu, cart, and order features.
           </p>
         </div>
 
@@ -100,6 +104,10 @@ function RegisterPage() {
 
             {message && <p className="success-text">{message}</p>}
             {error && <p className="error-text">{error}</p>}
+
+            <p className="inline-link">
+              Already have an account? <Link to="/login">Login</Link>
+            </p>
           </form>
         </div>
       </div>

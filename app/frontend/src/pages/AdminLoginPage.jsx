@@ -1,17 +1,16 @@
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import api from '../utils/api';
 import { setCredentials } from '../features/auth/authSlice';
 import { isAdminEmail } from '../utils/auth';
 
-function LoginPage() {
+function AdminLoginPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
   const [error, setError] = useState('');
 
   const handleChange = (e) => {
@@ -21,21 +20,26 @@ function LoginPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setMessage('');
     setError('');
 
     try {
       const res = await api.post('/api/users/login', formData);
-      const payload = {
-        ...res.data,
-        isAdmin: isAdminEmail(res.data.email),
-      };
+      if (!isAdminEmail(res.data.email)) {
+        setError(
+          "This frontend treats emails containing 'admin' as admin accounts. Your backend still needs real admin role support."
+        );
+        return;
+      }
 
-      dispatch(setCredentials(payload));
-      setMessage('Login successful!');
-      navigate('/');
+      dispatch(
+        setCredentials({
+          ...res.data,
+          isAdmin: true,
+        })
+      );
+      navigate('/admin');
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed');
+      setError(err.response?.data?.message || 'Admin login failed');
     } finally {
       setLoading(false);
     }
@@ -44,22 +48,22 @@ function LoginPage() {
   return (
     <div className="auth-page">
       <div className="auth-card">
-        <div className="auth-left">
-          <p className="eyebrow">Welcome Back</p>
-          <h2>Login</h2>
+        <div className="auth-left dark-panel">
+          <p className="eyebrow">Administrator Access</p>
+          <h2>Admin Login</h2>
           <p className="auth-text">
-            Sign in to browse the menu, manage your cart, and place orders.
+            Log in with an email containing “admin” to access the admin UI.
           </p>
         </div>
 
         <div className="auth-right">
           <form className="auth-form" onSubmit={handleSubmit}>
             <div className="form-group">
-              <label>Email</label>
+              <label>Admin Email</label>
               <input
                 name="email"
                 type="email"
-                placeholder="Enter your email"
+                placeholder="admin@example.com"
                 value={formData.email}
                 onChange={handleChange}
                 required
@@ -79,19 +83,14 @@ function LoginPage() {
             </div>
 
             <button
-              className="btn btn-primary full-width"
+              className="btn btn-dark full-width"
               type="submit"
               disabled={loading}
             >
-              {loading ? 'Logging in...' : 'Login'}
+              {loading ? 'Checking...' : 'Login as Admin'}
             </button>
 
-            {message && <p className="success-text">{message}</p>}
             {error && <p className="error-text">{error}</p>}
-
-            <p className="inline-link">
-              Don’t have an account? <Link to="/register">Register</Link>
-            </p>
           </form>
         </div>
       </div>
@@ -99,4 +98,4 @@ function LoginPage() {
   );
 }
 
-export default LoginPage;
+export default AdminLoginPage;
