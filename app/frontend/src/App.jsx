@@ -63,12 +63,6 @@ function App() {
             </>
           )}
 
-          {userInfo?.isAdmin && (
-            <Link to="/admin" className="nav-btn">
-              Admin
-            </Link>
-          )}
-
           {userInfo && (
             <button className="nav-btn logout-btn" onClick={handleLogout}>
               Logout

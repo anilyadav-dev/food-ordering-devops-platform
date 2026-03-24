@@ -4,8 +4,13 @@ import { Navigate } from 'react-router-dom';
 function AdminRoute({ children }) {
   const { userInfo } = useSelector((state) => state.auth);
 
-  if (!userInfo) return <Navigate to="/admin-login" replace />;
-  if (!userInfo.isAdmin) return <Navigate to="/" replace />;
+  if (!userInfo) {
+    return <Navigate to="/admin-login" replace />;
+  }
+
+  if (!userInfo.isAdmin) {
+    return <Navigate to="/" replace />;
+  }
 
   return children;
 }

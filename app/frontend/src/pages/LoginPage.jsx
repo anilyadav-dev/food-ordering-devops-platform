@@ -3,7 +3,6 @@ import { useDispatch } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../utils/api';
 import { setCredentials } from '../features/auth/authSlice';
-import { isAdminEmail } from '../utils/auth';
 
 function LoginPage() {
   const dispatch = useDispatch();
@@ -26,12 +25,7 @@ function LoginPage() {
 
     try {
       const res = await api.post('/api/users/login', formData);
-      const payload = {
-        ...res.data,
-        isAdmin: isAdminEmail(res.data.email),
-      };
-
-      dispatch(setCredentials(payload));
+      dispatch(setCredentials(res.data));
       setMessage('Login successful!');
       navigate('/');
     } catch (err) {

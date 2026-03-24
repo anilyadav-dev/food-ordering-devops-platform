@@ -3,7 +3,6 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import api from '../utils/api';
 import { setCredentials } from '../features/auth/authSlice';
-import { isAdminEmail } from '../utils/auth';
 
 function AdminLoginPage() {
   const dispatch = useDispatch();
@@ -23,20 +22,8 @@ function AdminLoginPage() {
     setError('');
 
     try {
-      const res = await api.post('/api/users/login', formData);
-      if (!isAdminEmail(res.data.email)) {
-        setError(
-          "This frontend treats emails containing 'admin' as admin accounts. Your backend still needs real admin role support."
-        );
-        return;
-      }
-
-      dispatch(
-        setCredentials({
-          ...res.data,
-          isAdmin: true,
-        })
-      );
+      const res = await api.post('/api/users/admin-login', formData);
+      dispatch(setCredentials(res.data));
       navigate('/admin');
     } catch (err) {
       setError(err.response?.data?.message || 'Admin login failed');
@@ -52,7 +39,7 @@ function AdminLoginPage() {
           <p className="eyebrow">Administrator Access</p>
           <h2>Admin Login</h2>
           <p className="auth-text">
-            Log in with an email containing “admin” to access the admin UI.
+            Only accounts with backend admin access can sign in here.
           </p>
         </div>
 
