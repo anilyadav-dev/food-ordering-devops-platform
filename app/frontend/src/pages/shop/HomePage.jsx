@@ -1,5 +1,5 @@
-import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
 
 function HomePage() {
   const { userInfo } = useSelector((state) => state.auth);

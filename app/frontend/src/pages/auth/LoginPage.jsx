@@ -1,17 +1,19 @@
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { useNavigate, Link } from 'react-router-dom';
-import api from '../utils/api';
-import { setCredentials } from '../features/auth/authSlice';
+import { Link, useNavigate } from 'react-router-dom';
+import FeedbackMessage from '../../components/FeedbackMessage';
+import { loginUser } from '../../api/authService';
+import { setCredentials } from '../../features/auth/authSlice';
 
 function LoginPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
   const [formData, setFormData] = useState({ email: '', password: '' });
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
+  const [status, setStatus] = useState({
+    loading: false,
+    message: '',
+    error: '',
+  });
 
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -19,19 +21,19 @@ function LoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setMessage('');
-    setError('');
+    setStatus({ loading: true, message: '', error: '' });
 
     try {
-      const res = await api.post('/api/users/login', formData);
-      dispatch(setCredentials(res.data));
-      setMessage('Login successful!');
+      const user = await loginUser(formData);
+      dispatch(setCredentials(user));
+      setStatus({ loading: false, message: 'Login successful!', error: '' });
       navigate('/');
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed');
-    } finally {
-      setLoading(false);
+      setStatus({
+        loading: false,
+        message: '',
+        error: err.response?.data?.message || 'Login failed',
+      });
     }
   };
 
@@ -75,13 +77,13 @@ function LoginPage() {
             <button
               className="btn btn-primary full-width"
               type="submit"
-              disabled={loading}
+              disabled={status.loading}
             >
-              {loading ? 'Logging in...' : 'Login'}
+              {status.loading ? 'Logging in...' : 'Login'}
             </button>
 
-            {message && <p className="success-text">{message}</p>}
-            {error && <p className="error-text">{error}</p>}
+            <FeedbackMessage message={status.message} />
+            <FeedbackMessage message={status.error} type="error" />
 
             <p className="inline-link">
               Don’t have an account? <Link to="/register">Register</Link>

@@ -1,45 +1,45 @@
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import api from '../utils/api';
+import { fetchOrderHistory } from '../../api/orderService';
+import PageHeader from '../../components/PageHeader';
 
 function OrderHistoryPage() {
   const { userInfo } = useSelector((state) => state.auth);
   const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [status, setStatus] = useState({ loading: true, error: '' });
 
   useEffect(() => {
-    const fetchOrders = async () => {
-      if (!userInfo?._id) return;
+    const loadOrders = async () => {
+      if (!userInfo?._id) {
+        setStatus({ loading: false, error: '' });
+        return;
+      }
 
       try {
-        const res = await api.get(`/api/orders/${userInfo._id}`);
-        setOrders(res.data);
+        const history = await fetchOrderHistory(userInfo._id);
+        setOrders(history);
+        setStatus({ loading: false, error: '' });
       } catch (err) {
-        setError('Failed to load order history');
-      } finally {
-        setLoading(false);
+        setStatus({ loading: false, error: 'Failed to load order history' });
       }
     };
 
-    fetchOrders();
+    loadOrders();
   }, [userInfo]);
 
   return (
     <div className="page-card">
-      <div className="page-header">
-        <div>
-          <p className="eyebrow">Order History</p>
-          <h2 className="section-title">Your Previous Orders</h2>
-          <p className="auth-text">See all orders placed from your account.</p>
-        </div>
-        <div className="menu-badge">{orders.length} Orders</div>
-      </div>
+      <PageHeader
+        eyebrow="Order History"
+        title="Your Previous Orders"
+        description="See all orders placed from your account."
+        badge={`${orders.length} Orders`}
+      />
 
-      {loading ? (
+      {status.loading ? (
         <p className="auth-text">Loading order history...</p>
-      ) : error ? (
-        <p className="error-text">{error}</p>
+      ) : status.error ? (
+        <p className="error-text">{status.error}</p>
       ) : orders.length === 0 ? (
         <p className="auth-text">No orders found yet.</p>
       ) : (

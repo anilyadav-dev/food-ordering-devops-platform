@@ -1,5 +1,12 @@
 import { useEffect, useState } from 'react';
-import api from '../utils/api';
+import FeedbackMessage from '../../components/FeedbackMessage';
+import PageHeader from '../../components/PageHeader';
+import {
+  createMenuItem,
+  deleteMenuItem,
+  fetchMenuItems,
+  updateMenuItem,
+} from '../../api/menuService';
 
 const initialForm = {
   name: '',
@@ -13,21 +20,26 @@ function AdminDashboardPage() {
   const [menuItems, setMenuItems] = useState([]);
   const [formData, setFormData] = useState(initialForm);
   const [editingId, setEditingId] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
+  const [status, setStatus] = useState({
+    loading: false,
+    message: '',
+    error: '',
+  });
 
-  const fetchMenu = async () => {
+  const loadMenu = async () => {
     try {
-      const res = await api.get('/api/menu');
-      setMenuItems(res.data);
+      const items = await fetchMenuItems();
+      setMenuItems(items);
     } catch (err) {
-      setError('Failed to load menu items');
+      setStatus((current) => ({
+        ...current,
+        error: 'Failed to load menu items',
+      }));
     }
   };
 
   useEffect(() => {
-    fetchMenu();
+    loadMenu();
   }, []);
 
   const handleChange = (e) => {
@@ -41,30 +53,36 @@ function AdminDashboardPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setMessage('');
-    setError('');
+    setStatus({ loading: true, message: '', error: '' });
+
+    const payload = {
+      ...formData,
+      price: Number(formData.price),
+    };
 
     try {
-      const payload = {
-        ...formData,
-        price: Number(formData.price),
-      };
-
       if (editingId) {
-        await api.put(`/api/menu/${editingId}`, payload);
-        setMessage('Menu item updated successfully!');
+        await updateMenuItem(editingId, payload);
       } else {
-        await api.post('/api/menu', payload);
-        setMessage('Food item added successfully!');
+        await createMenuItem(payload);
       }
 
+      const wasEditing = Boolean(editingId);
       resetForm();
-      fetchMenu();
+      await loadMenu();
+      setStatus({
+        loading: false,
+        message: wasEditing
+          ? 'Menu item updated successfully!'
+          : 'Food item added successfully!',
+        error: '',
+      });
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to save menu item');
-    } finally {
-      setLoading(false);
+      setStatus({
+        loading: false,
+        message: '',
+        error: err.response?.data?.message || 'Failed to save menu item',
+      });
     }
   };
 
@@ -77,35 +95,39 @@ function AdminDashboardPage() {
       category: item.category || '',
       image: item.image || '',
     });
+    setStatus((current) => ({ ...current, message: '', error: '' }));
   };
 
   const handleDelete = async (id) => {
     try {
-      await api.delete(`/api/menu/${id}`);
-      setMessage('Menu item deleted successfully!');
-      if (editingId === id) resetForm();
-      fetchMenu();
+      await deleteMenuItem(id);
+      if (editingId === id) {
+        resetForm();
+      }
+      await loadMenu();
+      setStatus({
+        loading: false,
+        message: 'Menu item deleted successfully!',
+        error: '',
+      });
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to delete menu item');
+      setStatus({
+        loading: false,
+        message: '',
+        error: err.response?.data?.message || 'Failed to delete menu item',
+      });
     }
   };
 
   return (
     <div className="dashboard-layout">
       <div className="page-card">
-        <div className="page-header">
-          <div>
-            <p className="eyebrow">Admin Dashboard</p>
-            <h2 className="section-title">
-              {editingId ? 'Edit Food Item' : 'Add Food Item'}
-            </h2>
-            <p className="auth-text">
-              Manage menu items: add food, food image URL, edit menu, and delete
-              menu.
-            </p>
-          </div>
-          <div className="menu-badge">Admin Control</div>
-        </div>
+        <PageHeader
+          eyebrow="Admin Dashboard"
+          title={editingId ? 'Edit Food Item' : 'Add Food Item'}
+          description="Manage menu items: add food, food image URL, edit menu, and delete menu."
+          badge="Admin Control"
+        />
 
         <form className="admin-form" onSubmit={handleSubmit}>
           <div className="form-group">
@@ -170,9 +192,13 @@ function AdminDashboardPage() {
             <button
               className="btn btn-primary"
               type="submit"
-              disabled={loading}
+              disabled={status.loading}
             >
-              {loading ? 'Saving...' : editingId ? 'Update Food' : 'Add Food'}
+              {status.loading
+                ? 'Saving...'
+                : editingId
+                  ? 'Update Food'
+                  : 'Add Food'}
             </button>
             {editingId && (
               <button
@@ -185,19 +211,17 @@ function AdminDashboardPage() {
             )}
           </div>
 
-          {message && <p className="success-text">{message}</p>}
-          {error && <p className="error-text">{error}</p>}
+          <FeedbackMessage message={status.message} />
+          <FeedbackMessage message={status.error} type="error" />
         </form>
       </div>
 
       <div className="page-card">
-        <div className="page-header">
-          <div>
-            <p className="eyebrow">Current Menu</p>
-            <h2 className="section-title">Manage Existing Food Items</h2>
-          </div>
-          <div className="menu-badge">{menuItems.length} Items</div>
-        </div>
+        <PageHeader
+          eyebrow="Current Menu"
+          title="Manage Existing Food Items"
+          badge={`${menuItems.length} Items`}
+        />
 
         <div className="menu-grid">
           {menuItems.map((item) => (

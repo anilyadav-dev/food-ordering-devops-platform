@@ -1,20 +1,24 @@
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import FeedbackMessage from '../../components/FeedbackMessage';
+import PageHeader from '../../components/PageHeader';
 import {
   clearCart,
   decreaseQty,
   increaseQty,
   removeFromCart,
-} from '../features/cart/cartSlice';
-import api from '../utils/api';
+} from '../../features/cart/cartSlice';
+import { placeOrder } from '../../api/orderService';
 
 function CartPage() {
   const dispatch = useDispatch();
   const { cartItems } = useSelector((state) => state.cart);
   const { userInfo } = useSelector((state) => state.auth);
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
+  const [status, setStatus] = useState({
+    loading: false,
+    message: '',
+    error: '',
+  });
 
   const totalCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
   const totalPrice = cartItems.reduce(
@@ -24,62 +28,61 @@ function CartPage() {
 
   const handlePlaceOrder = async () => {
     if (!userInfo?._id) {
-      setError('Please login first');
-      setMessage('');
+      setStatus({
+        loading: false,
+        message: '',
+        error: 'Please login first',
+      });
       return;
     }
 
     if (cartItems.length === 0) {
-      setError('Your cart is empty. Add items before ordering.');
-      setMessage('');
+      setStatus({
+        loading: false,
+        message: '',
+        error: 'Your cart is empty. Add items before ordering.',
+      });
       return;
     }
 
+    setStatus({ loading: true, message: '', error: '' });
+
     try {
-      setLoading(true);
-      setMessage('');
-      setError('');
-
-      for (const item of cartItems) {
-        await api.post('/api/cart', {
-          user: userInfo._id,
-          menuItem: item._id,
-          quantity: item.quantity,
-        });
-      }
-
-      await api.post('/api/orders', {
-        user: userInfo._id,
+      await placeOrder({
+        userId: userInfo._id,
+        cartItems,
       });
 
       dispatch(clearCart());
-      setMessage('Order placed successfully!');
+      setStatus({
+        loading: false,
+        message: 'Order placed successfully!',
+        error: '',
+      });
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to place order');
-    } finally {
-      setLoading(false);
+      setStatus({
+        loading: false,
+        message: '',
+        error: err.response?.data?.message || 'Failed to place order',
+      });
     }
   };
 
   return (
     <div className="page-card">
-      <div className="page-header">
-        <div>
-          <p className="eyebrow">Your Cart</p>
-          <h2 className="section-title">Cart Items</h2>
-          <p className="auth-text">
-            Increase, decrease, remove items, and place your order from here.
-          </p>
-        </div>
-        <div className="menu-badge">{totalCount} Items</div>
-      </div>
+      <PageHeader
+        eyebrow="Your Cart"
+        title="Cart Items"
+        description="Increase, decrease, remove items, and place your order from here."
+        badge={`${totalCount} Items`}
+      />
 
-      {message && <p className="success-text">{message}</p>}
-      {error && <p className="error-text">{error}</p>}
+      <FeedbackMessage message={status.message} />
+      <FeedbackMessage message={status.error} type="error" />
 
       {cartItems.length === 0 ? (
         <p className="auth-text">
-          {message
+          {status.message
             ? 'Your order has been placed and the cart is now empty.'
             : 'Your cart is empty right now.'}
         </p>
@@ -129,9 +132,9 @@ function CartPage() {
               <button
                 className="btn btn-dark"
                 onClick={handlePlaceOrder}
-                disabled={loading}
+                disabled={status.loading}
               >
-                {loading ? 'Placing Order...' : 'Place Order'}
+                {status.loading ? 'Placing Order...' : 'Place Order'}
               </button>
               <button
                 className="btn btn-secondary"

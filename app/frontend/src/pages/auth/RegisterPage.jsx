@@ -1,21 +1,23 @@
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { useNavigate, Link } from 'react-router-dom';
-import api from '../utils/api';
-import { setCredentials } from '../features/auth/authSlice';
+import { Link, useNavigate } from 'react-router-dom';
+import FeedbackMessage from '../../components/FeedbackMessage';
+import { registerUser } from '../../api/authService';
+import { setCredentials } from '../../features/auth/authSlice';
 
 function RegisterPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: '',
   });
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
+  const [status, setStatus] = useState({
+    loading: false,
+    message: '',
+    error: '',
+  });
 
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -23,19 +25,23 @@ function RegisterPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setMessage('');
-    setError('');
+    setStatus({ loading: true, message: '', error: '' });
 
     try {
-      const res = await api.post('/api/users', formData);
-      dispatch(setCredentials(res.data));
-      setMessage('Registration successful!');
+      const user = await registerUser(formData);
+      dispatch(setCredentials(user));
+      setStatus({
+        loading: false,
+        message: 'Registration successful!',
+        error: '',
+      });
       navigate('/');
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed');
-    } finally {
-      setLoading(false);
+      setStatus({
+        loading: false,
+        message: '',
+        error: err.response?.data?.message || 'Registration failed',
+      });
     }
   };
 
@@ -91,13 +97,13 @@ function RegisterPage() {
             <button
               className="btn btn-primary full-width"
               type="submit"
-              disabled={loading}
+              disabled={status.loading}
             >
-              {loading ? 'Registering...' : 'Register'}
+              {status.loading ? 'Registering...' : 'Register'}
             </button>
 
-            {message && <p className="success-text">{message}</p>}
-            {error && <p className="error-text">{error}</p>}
+            <FeedbackMessage message={status.message} />
+            <FeedbackMessage message={status.error} type="error" />
 
             <p className="inline-link">
               Already have an account? <Link to="/login">Login</Link>

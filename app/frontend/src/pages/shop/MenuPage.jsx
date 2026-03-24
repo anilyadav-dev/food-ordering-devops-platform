@@ -1,65 +1,63 @@
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { addToCart } from '../features/cart/cartSlice';
-import api from '../utils/api';
+import { fetchMenuItems } from '../../api/menuService';
+import PageHeader from '../../components/PageHeader';
+import { addToCart } from '../../features/cart/cartSlice';
 
 function MenuPage() {
   const dispatch = useDispatch();
   const [menuItems, setMenuItems] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [status, setStatus] = useState({ loading: true, error: '' });
 
   useEffect(() => {
-    const fetchMenu = async () => {
+    const loadMenu = async () => {
       try {
-        const res = await api.get('/api/menu');
-        setMenuItems(res.data);
+        const items = await fetchMenuItems();
+        setMenuItems(items);
       } catch (err) {
-        setError('Failed to load menu');
-      } finally {
-        setLoading(false);
+        setStatus({ loading: false, error: 'Failed to load menu' });
+        return;
       }
+
+      setStatus({ loading: false, error: '' });
     };
 
-    fetchMenu();
+    loadMenu();
   }, []);
 
   const handleAddToCart = (item) => {
     dispatch(addToCart(item));
   };
 
-  if (loading) {
+  if (status.loading) {
     return (
       <div className="page-card">
-        <p className="eyebrow">Food Menu</p>
-        <h2 className="section-title">Available Menu Items</h2>
-        <p className="auth-text">Loading menu...</p>
+        <PageHeader
+          eyebrow="Food Menu"
+          title="Available Menu Items"
+          description="Loading menu..."
+        />
       </div>
     );
   }
 
-  if (error) {
+  if (status.error) {
     return (
       <div className="page-card">
-        <p className="eyebrow">Food Menu</p>
-        <h2 className="section-title">Available Menu Items</h2>
-        <p className="error-text">{error}</p>
+        <PageHeader eyebrow="Food Menu" title="Available Menu Items" />
+        <p className="error-text">{status.error}</p>
       </div>
     );
   }
 
   return (
     <div className="page-card">
-      <div className="page-header">
-        <div>
-          <p className="eyebrow">Food Menu</p>
-          <h2 className="section-title">Available Menu Items</h2>
-          <p className="auth-text">
-            Explore delicious items and add them to your cart.
-          </p>
-        </div>
-        <div className="menu-badge">{menuItems.length} Items</div>
-      </div>
+      <PageHeader
+        eyebrow="Food Menu"
+        title="Available Menu Items"
+        description="Explore delicious items and add them to your cart."
+        badge={`${menuItems.length} Items`}
+      />
 
       <div className="menu-grid">
         {menuItems.map((item) => (

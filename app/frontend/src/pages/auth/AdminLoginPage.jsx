@@ -1,16 +1,15 @@
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import api from '../utils/api';
-import { setCredentials } from '../features/auth/authSlice';
+import FeedbackMessage from '../../components/FeedbackMessage';
+import { loginAdmin } from '../../api/authService';
+import { setCredentials } from '../../features/auth/authSlice';
 
 function AdminLoginPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
   const [formData, setFormData] = useState({ email: '', password: '' });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [status, setStatus] = useState({ loading: false, error: '' });
 
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -18,18 +17,21 @@ function AdminLoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setError('');
+    setStatus({ loading: true, error: '' });
 
     try {
-      const res = await api.post('/api/users/admin-login', formData);
-      dispatch(setCredentials(res.data));
+      const user = await loginAdmin(formData);
+      dispatch(setCredentials(user));
       navigate('/admin');
     } catch (err) {
-      setError(err.response?.data?.message || 'Admin login failed');
-    } finally {
-      setLoading(false);
+      setStatus({
+        loading: false,
+        error: err.response?.data?.message || 'Admin login failed',
+      });
+      return;
     }
+
+    setStatus({ loading: false, error: '' });
   };
 
   return (
@@ -72,12 +74,12 @@ function AdminLoginPage() {
             <button
               className="btn btn-dark full-width"
               type="submit"
-              disabled={loading}
+              disabled={status.loading}
             >
-              {loading ? 'Checking...' : 'Login as Admin'}
+              {status.loading ? 'Checking...' : 'Login as Admin'}
             </button>
 
-            {error && <p className="error-text">{error}</p>}
+            <FeedbackMessage message={status.error} type="error" />
           </form>
         </div>
       </div>
