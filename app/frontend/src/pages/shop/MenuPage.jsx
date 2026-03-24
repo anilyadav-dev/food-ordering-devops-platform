@@ -1,35 +1,22 @@
-import { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { fetchMenuItems } from '../../api/menuService';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import PageHeader from '../../components/PageHeader';
 import { addToCart } from '../../features/cart/cartSlice';
+import { fetchMenu } from '../../features/menu/menuSlice';
 
 function MenuPage() {
   const dispatch = useDispatch();
-  const [menuItems, setMenuItems] = useState([]);
-  const [status, setStatus] = useState({ loading: true, error: '' });
+  const { items, loading, error } = useSelector((state) => state.menu);
 
   useEffect(() => {
-    const loadMenu = async () => {
-      try {
-        const items = await fetchMenuItems();
-        setMenuItems(items);
-      } catch (err) {
-        setStatus({ loading: false, error: 'Failed to load menu' });
-        return;
-      }
-
-      setStatus({ loading: false, error: '' });
-    };
-
-    loadMenu();
-  }, []);
+    dispatch(fetchMenu());
+  }, [dispatch]);
 
   const handleAddToCart = (item) => {
     dispatch(addToCart(item));
   };
 
-  if (status.loading) {
+  if (loading) {
     return (
       <div className="page-card">
         <PageHeader
@@ -41,11 +28,11 @@ function MenuPage() {
     );
   }
 
-  if (status.error) {
+  if (error) {
     return (
       <div className="page-card">
         <PageHeader eyebrow="Food Menu" title="Available Menu Items" />
-        <p className="error-text">{status.error}</p>
+        <p className="error-text">{error}</p>
       </div>
     );
   }
@@ -56,11 +43,11 @@ function MenuPage() {
         eyebrow="Food Menu"
         title="Available Menu Items"
         description="Explore delicious items and add them to your cart."
-        badge={`${menuItems.length} Items`}
+        badge={`${items.length} Items`}
       />
 
       <div className="menu-grid">
-        {menuItems.map((item) => (
+        {items.map((item) => (
           <div key={item._id} className="menu-card">
             <div className="menu-card-top">
               <div className="menu-icon">🍽️</div>

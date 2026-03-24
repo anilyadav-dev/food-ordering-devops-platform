@@ -1,31 +1,18 @@
-import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { fetchOrderHistory } from '../../api/orderService';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import PageHeader from '../../components/PageHeader';
+import { fetchOrders } from '../../features/order/orderSlice';
 
 function OrderHistoryPage() {
+  const dispatch = useDispatch();
   const { userInfo } = useSelector((state) => state.auth);
-  const [orders, setOrders] = useState([]);
-  const [status, setStatus] = useState({ loading: true, error: '' });
+  const { orders, loading, error } = useSelector((state) => state.order);
 
   useEffect(() => {
-    const loadOrders = async () => {
-      if (!userInfo?._id) {
-        setStatus({ loading: false, error: '' });
-        return;
-      }
-
-      try {
-        const history = await fetchOrderHistory(userInfo._id);
-        setOrders(history);
-        setStatus({ loading: false, error: '' });
-      } catch (err) {
-        setStatus({ loading: false, error: 'Failed to load order history' });
-      }
-    };
-
-    loadOrders();
-  }, [userInfo]);
+    if (userInfo?._id) {
+      dispatch(fetchOrders(userInfo._id));
+    }
+  }, [dispatch, userInfo]);
 
   return (
     <div className="page-card">
@@ -36,10 +23,10 @@ function OrderHistoryPage() {
         badge={`${orders.length} Orders`}
       />
 
-      {status.loading ? (
+      {loading ? (
         <p className="auth-text">Loading order history...</p>
-      ) : status.error ? (
-        <p className="error-text">{status.error}</p>
+      ) : error ? (
+        <p className="error-text">{error}</p>
       ) : orders.length === 0 ? (
         <p className="auth-text">No orders found yet.</p>
       ) : (

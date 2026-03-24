@@ -1,15 +1,14 @@
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import FeedbackMessage from '../../components/FeedbackMessage';
-import { loginAdmin } from '../../api/authService';
-import { setCredentials } from '../../features/auth/authSlice';
+import { loginAdmin } from '../../features/auth/authSlice';
 
 function AdminLoginPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { loading, error } = useSelector((state) => state.auth);
   const [formData, setFormData] = useState({ email: '', password: '' });
-  const [status, setStatus] = useState({ loading: false, error: '' });
 
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -17,21 +16,11 @@ function AdminLoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setStatus({ loading: true, error: '' });
+    const resultAction = await dispatch(loginAdmin(formData));
 
-    try {
-      const user = await loginAdmin(formData);
-      dispatch(setCredentials(user));
+    if (loginAdmin.fulfilled.match(resultAction)) {
       navigate('/admin');
-    } catch (err) {
-      setStatus({
-        loading: false,
-        error: err.response?.data?.message || 'Admin login failed',
-      });
-      return;
     }
-
-    setStatus({ loading: false, error: '' });
   };
 
   return (
@@ -74,12 +63,12 @@ function AdminLoginPage() {
             <button
               className="btn btn-dark full-width"
               type="submit"
-              disabled={status.loading}
+              disabled={loading}
             >
-              {status.loading ? 'Checking...' : 'Login as Admin'}
+              {loading ? 'Checking...' : 'Login as Admin'}
             </button>
 
-            <FeedbackMessage message={status.error} type="error" />
+            <FeedbackMessage message={error} type="error" />
           </form>
         </div>
       </div>

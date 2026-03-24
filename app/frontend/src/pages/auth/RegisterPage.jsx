@@ -1,22 +1,17 @@
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import FeedbackMessage from '../../components/FeedbackMessage';
-import { registerUser } from '../../api/authService';
-import { setCredentials } from '../../features/auth/authSlice';
+import { registerUser } from '../../features/auth/authSlice';
 
 function RegisterPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { loading, error, successMessage } = useSelector((state) => state.auth);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: '',
-  });
-  const [status, setStatus] = useState({
-    loading: false,
-    message: '',
-    error: '',
   });
 
   const handleChange = (e) => {
@@ -25,23 +20,10 @@ function RegisterPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setStatus({ loading: true, message: '', error: '' });
+    const resultAction = await dispatch(registerUser(formData));
 
-    try {
-      const user = await registerUser(formData);
-      dispatch(setCredentials(user));
-      setStatus({
-        loading: false,
-        message: 'Registration successful!',
-        error: '',
-      });
+    if (registerUser.fulfilled.match(resultAction)) {
       navigate('/');
-    } catch (err) {
-      setStatus({
-        loading: false,
-        message: '',
-        error: err.response?.data?.message || 'Registration failed',
-      });
     }
   };
 
@@ -97,13 +79,13 @@ function RegisterPage() {
             <button
               className="btn btn-primary full-width"
               type="submit"
-              disabled={status.loading}
+              disabled={loading}
             >
-              {status.loading ? 'Registering...' : 'Register'}
+              {loading ? 'Registering...' : 'Register'}
             </button>
 
-            <FeedbackMessage message={status.message} />
-            <FeedbackMessage message={status.error} type="error" />
+            <FeedbackMessage message={successMessage} />
+            <FeedbackMessage message={error} type="error" />
 
             <p className="inline-link">
               Already have an account? <Link to="/login">Login</Link>

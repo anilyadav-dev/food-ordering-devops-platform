@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import FeedbackMessage from '../../components/FeedbackMessage';
 import PageHeader from '../../components/PageHeader';
 import {
-  createMenuItem,
-  deleteMenuItem,
-  fetchMenuItems,
-  updateMenuItem,
-} from '../../api/menuService';
+  clearMenuFeedback,
+  createMenu,
+  editMenu,
+  fetchMenu,
+  removeMenu,
+} from '../../features/menu/menuSlice';
 
 const initialForm = {
   name: '',
@@ -17,30 +19,16 @@ const initialForm = {
 };
 
 function AdminDashboardPage() {
-  const [menuItems, setMenuItems] = useState([]);
+  const dispatch = useDispatch();
+  const { items, loading, actionLoading, error, successMessage } = useSelector(
+    (state) => state.menu
+  );
   const [formData, setFormData] = useState(initialForm);
   const [editingId, setEditingId] = useState('');
-  const [status, setStatus] = useState({
-    loading: false,
-    message: '',
-    error: '',
-  });
-
-  const loadMenu = async () => {
-    try {
-      const items = await fetchMenuItems();
-      setMenuItems(items);
-    } catch (err) {
-      setStatus((current) => ({
-        ...current,
-        error: 'Failed to load menu items',
-      }));
-    }
-  };
 
   useEffect(() => {
-    loadMenu();
-  }, []);
+    dispatch(fetchMenu());
+  }, [dispatch]);
 
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -53,36 +41,22 @@ function AdminDashboardPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setStatus({ loading: true, message: '', error: '' });
+    dispatch(clearMenuFeedback());
 
     const payload = {
       ...formData,
       price: Number(formData.price),
     };
 
-    try {
-      if (editingId) {
-        await updateMenuItem(editingId, payload);
-      } else {
-        await createMenuItem(payload);
-      }
+    const resultAction = editingId
+      ? await dispatch(editMenu({ id: editingId, payload }))
+      : await dispatch(createMenu(payload));
 
-      const wasEditing = Boolean(editingId);
+    if (
+      editMenu.fulfilled.match(resultAction) ||
+      createMenu.fulfilled.match(resultAction)
+    ) {
       resetForm();
-      await loadMenu();
-      setStatus({
-        loading: false,
-        message: wasEditing
-          ? 'Menu item updated successfully!'
-          : 'Food item added successfully!',
-        error: '',
-      });
-    } catch (err) {
-      setStatus({
-        loading: false,
-        message: '',
-        error: err.response?.data?.message || 'Failed to save menu item',
-      });
     }
   };
 
@@ -95,27 +69,14 @@ function AdminDashboardPage() {
       category: item.category || '',
       image: item.image || '',
     });
-    setStatus((current) => ({ ...current, message: '', error: '' }));
+    dispatch(clearMenuFeedback());
   };
 
   const handleDelete = async (id) => {
-    try {
-      await deleteMenuItem(id);
-      if (editingId === id) {
-        resetForm();
-      }
-      await loadMenu();
-      setStatus({
-        loading: false,
-        message: 'Menu item deleted successfully!',
-        error: '',
-      });
-    } catch (err) {
-      setStatus({
-        loading: false,
-        message: '',
-        error: err.response?.data?.message || 'Failed to delete menu item',
-      });
+    const resultAction = await dispatch(removeMenu(id));
+
+    if (removeMenu.fulfilled.match(resultAction) && editingId === id) {
+      resetForm();
     }
   };
 
@@ -192,9 +153,9 @@ function AdminDashboardPage() {
             <button
               className="btn btn-primary"
               type="submit"
-              disabled={status.loading}
+              disabled={actionLoading}
             >
-              {status.loading
+              {actionLoading
                 ? 'Saving...'
                 : editingId
                   ? 'Update Food'
@@ -211,8 +172,8 @@ function AdminDashboardPage() {
             )}
           </div>
 
-          <FeedbackMessage message={status.message} />
-          <FeedbackMessage message={status.error} type="error" />
+          <FeedbackMessage message={successMessage} />
+          <FeedbackMessage message={error} type="error" />
         </form>
       </div>
 
@@ -220,43 +181,49 @@ function AdminDashboardPage() {
         <PageHeader
           eyebrow="Current Menu"
           title="Manage Existing Food Items"
-          badge={`${menuItems.length} Items`}
+          badge={`${items.length} Items`}
         />
 
-        <div className="menu-grid">
-          {menuItems.map((item) => (
-            <div key={item._id} className="menu-card">
-              <div className="menu-card-top">
-                <div className="menu-icon">🍱</div>
-                <span className="menu-category">{item.category || 'Food'}</span>
-              </div>
+        {loading ? (
+          <p className="auth-text">Loading menu items...</p>
+        ) : (
+          <div className="menu-grid">
+            {items.map((item) => (
+              <div key={item._id} className="menu-card">
+                <div className="menu-card-top">
+                  <div className="menu-icon">🍱</div>
+                  <span className="menu-category">
+                    {item.category || 'Food'}
+                  </span>
+                </div>
 
-              <h3 className="menu-title">{item.name}</h3>
-              <p className="menu-description">{item.description}</p>
-              <p className="tiny-text">
-                <strong>Image:</strong> {item.image || 'No image URL'}
-              </p>
+                <h3 className="menu-title">{item.name}</h3>
+                <p className="menu-description">{item.description}</p>
+                <p className="tiny-text">
+                  <strong>Image:</strong> {item.image || 'No image URL'}
+                </p>
 
-              <div className="menu-footer">
-                <p className="menu-price">${item.price}</p>
-                <div className="inline-actions">
-                  <button
-                    className="btn btn-secondary"
-                    onClick={() => handleEdit(item)}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    className="btn btn-danger"
-                    onClick={() => handleDelete(item._id)}
-                  >
-                    Delete
-                  </button>
+                <div className="menu-footer">
+                  <p className="menu-price">${item.price}</p>
+                  <div className="inline-actions">
+                    <button
+                      className="btn btn-secondary"
+                      onClick={() => handleEdit(item)}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className="btn btn-danger"
+                      onClick={() => handleDelete(item._id)}
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

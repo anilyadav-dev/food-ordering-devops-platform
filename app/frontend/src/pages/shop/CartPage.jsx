@@ -8,17 +8,14 @@ import {
   increaseQty,
   removeFromCart,
 } from '../../features/cart/cartSlice';
-import { placeOrder } from '../../api/orderService';
+import { placeOrder } from '../../features/order/orderSlice';
 
 function CartPage() {
   const dispatch = useDispatch();
   const { cartItems } = useSelector((state) => state.cart);
-  const { userInfo } = useSelector((state) => state.auth);
-  const [status, setStatus] = useState({
-    loading: false,
-    message: '',
-    error: '',
-  });
+  const { placingOrder, successMessage, error } = useSelector(
+    (state) => state.order
+  );
 
   const totalCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
   const totalPrice = cartItems.reduce(
@@ -27,45 +24,7 @@ function CartPage() {
   );
 
   const handlePlaceOrder = async () => {
-    if (!userInfo?._id) {
-      setStatus({
-        loading: false,
-        message: '',
-        error: 'Please login first',
-      });
-      return;
-    }
-
-    if (cartItems.length === 0) {
-      setStatus({
-        loading: false,
-        message: '',
-        error: 'Your cart is empty. Add items before ordering.',
-      });
-      return;
-    }
-
-    setStatus({ loading: true, message: '', error: '' });
-
-    try {
-      await placeOrder({
-        userId: userInfo._id,
-        cartItems,
-      });
-
-      dispatch(clearCart());
-      setStatus({
-        loading: false,
-        message: 'Order placed successfully!',
-        error: '',
-      });
-    } catch (err) {
-      setStatus({
-        loading: false,
-        message: '',
-        error: err.response?.data?.message || 'Failed to place order',
-      });
-    }
+    dispatch(placeOrder());
   };
 
   return (
@@ -77,12 +36,12 @@ function CartPage() {
         badge={`${totalCount} Items`}
       />
 
-      <FeedbackMessage message={status.message} />
-      <FeedbackMessage message={status.error} type="error" />
+      <FeedbackMessage message={successMessage} />
+      <FeedbackMessage message={error} type="error" />
 
       {cartItems.length === 0 ? (
         <p className="auth-text">
-          {status.message
+          {successMessage
             ? 'Your order has been placed and the cart is now empty.'
             : 'Your cart is empty right now.'}
         </p>
@@ -132,9 +91,9 @@ function CartPage() {
               <button
                 className="btn btn-dark"
                 onClick={handlePlaceOrder}
-                disabled={status.loading}
+                disabled={placingOrder}
               >
-                {status.loading ? 'Placing Order...' : 'Place Order'}
+                {placingOrder ? 'Placing Order...' : 'Place Order'}
               </button>
               <button
                 className="btn btn-secondary"
