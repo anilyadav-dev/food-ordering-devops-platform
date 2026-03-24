@@ -249,6 +249,118 @@ JWT_SECRET=your_secret_key
 ✔ Frontend and backend integrated
 ✔ Code Quality
 
+## 🚀 Day 6 — Frontend Features (Redux + Full App Flow)
+
+### ✅ Features Implemented
+
+#### 🔐 Authentication Flow
+- Login / Register / Logout functionality
+- Global auth state using Redux Toolkit
+- Protected routes:
+  - Unauthenticated users → only Home, Login, Register
+  - Authenticated users → access Menu, Cart, Order History
+
+---
+
+#### 🍽️ Menu Page
+- Fetch menu items from backend API
+- Display items in responsive card layout
+- Add items to cart using Redux
+
+---
+
+#### 🛒 Cart Page (Enhanced)
+- Fully functional cart using Redux
+- Features:
+  - Increase item quantity
+  - Decrease item quantity
+  - Remove items
+  - Clear cart
+  - Display total price
+- Real-time cart updates across app
+- Cart count displayed in navbar
+
+---
+
+#### 📦 Order Workflow (Updated UX)
+- Flow:
+  Menu → Cart → Place Order → Order History
+
+- When placing order:
+  - Cart items synced to backend
+  - Order created via API
+  - Redux cart cleared after success
+  - Success message displayed
+
+---
+
+#### 📜 Order History Page
+- Displays previously placed orders
+- Connected to backend API
+
+---
+
+#### 🛡️ Protected Routing
+- Implemented `ProtectedRoute` component
+- Redirects unauthorized users to login page
+
+---
+
+#### 🧑‍💻 Admin Dashboard (UI)
+- Admin page created with:
+  - Add Menu (UI)
+  - Edit Menu (UI ready)
+  - Delete Menu (UI ready)
+- Displays:
+  - Logged-in user info
+  - Cart summary
+  - Backend feature status
+
+> Note: Admin backend role protection (isAdmin) can be added in future enhancement
+
+---
+
+#### 🎨 UI & UX Improvements
+- Fully responsive layout
+- Modern card-based UI
+- Navbar with dynamic state:
+  - Cart count
+  - Auth-based navigation
+- Clean spacing, typography, and button styles
+
+---
+
+### 🧠 Key Concepts Learned
+
+- Redux Toolkit (Slices, Store, Global State)
+- State synchronization between frontend and backend
+- Protected routes in React
+- Full-stack data flow (Menu → Cart → Order → History)
+- Component-based architecture
+- Real-world cart management logic
+- UX improvement by simplifying order flow
+
+---
+
+### 📌 Final App Flow
+
+#### Public Users:
+- Home
+- Login
+- Register
+
+#### Logged-in Users:
+- Home
+- Menu
+- Cart (with full functionality)
+- Order History
+- Logout
+
+#### Admin (UI):
+- Admin Dashboard
+- Menu Management (Add / Edit / Delete)
+
+---
 
 ## 👨‍💻 Author
 
