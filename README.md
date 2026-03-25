@@ -464,6 +464,66 @@ Container naming vs project naming
 ✔ Frontend integrated with backend
 ✔ Full system running using Docker Compose
 
+## ⚙️ Day 9 — GitHub Actions (CI) + NGINX
+
+### ✅ Features Implemented
+
+#### 🌐 NGINX Reverse Proxy
+- Created `nginx/default.conf`
+- Configured NGINX routing:
+  - `/` → frontend
+  - `/api` → backend
+- Added NGINX service in `docker-compose.yml`
+- Verified frontend is accessible through:
+  - `http://localhost`
+- Verified backend API is accessible through:
+  - `http://localhost/api/menu`
+
+---
+
+#### 🤖 GitHub Actions CI Pipeline
+- Created workflow file:
+  - `.github/workflows/ci.yml`
+- Added CI steps for:
+  - Checkout code
+  - Setup Node.js
+  - Install backend dependencies
+  - Run backend format check
+  - Install frontend dependencies
+  - Run frontend lint
+  - Run frontend format check
+  - Build backend Docker image
+  - Build frontend Docker image
+
+---
+
+#### 🛠️ CI Debugging and Fixes
+- Fixed frontend dependency installation issue using:
+  - `npm install --legacy-peer-deps`
+- Fixed frontend lint errors caused by unused variables
+- Verified pipeline passes successfully on GitHub Actions
+
+---
+
+### 🧠 Key Concepts Learned
+
+- Reverse proxy setup using NGINX
+- Single entry point architecture for frontend and backend
+- CI pipeline creation using GitHub Actions
+- Automated dependency install, lint, formatting, and Docker build checks
+- Debugging real CI failures and fixing them step by step
+
+---
+
+### 📌 Status
+
+✅ Day 9 Completed
+✔ NGINX routing working
+✔ Frontend accessible through `http://localhost`
+✔ Backend API accessible through NGINX
+✔ GitHub Actions CI working
+✔ Docker image build checks passing
+
 ## 👨‍💻 Author
 
 Anil Yadav
