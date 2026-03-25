@@ -7,9 +7,7 @@ import { loginUser } from '../../features/auth/authSlice';
 function LoginPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { userInfo, loading, error, successMessage } = useSelector(
-    (state) => state.auth
-  );
+  const { loading, error, successMessage } = useSelector((state) => state.auth);
   const [formData, setFormData] = useState({ email: '', password: '' });
 
   const handleChange = (e) => {
