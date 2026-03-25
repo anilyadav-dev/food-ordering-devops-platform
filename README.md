@@ -362,6 +362,108 @@ JWT_SECRET=your_secret_key
 
 ---
 
+🐳 Day 7 — Dockerize Backend and Frontend
+
+✅ Features Implemented
+
+🟢 Backend Dockerization
+Created Dockerfile for backend
+Used lightweight Node.js image (node:20-alpine)
+Installed dependencies inside container
+Configured backend to run using npm start
+Exposed backend on port 8080
+
+🔵 Frontend Dockerization
+Created Dockerfile for frontend (Vite + React)
+Installed dependencies inside container
+Built production-ready app using npm run build
+Served app using vite preview
+Fixed container networking issues:
+Added --host to expose app outside container
+Set port using --port 5173
+
+🧪 Container Testing
+Built backend Docker image
+Built frontend Docker image
+Ran backend container successfully
+Ran frontend container successfully
+Fixed issues:
+Port mismatch (5173 vs 4173)
+Vite not accessible from browser
+Dependency conflict using --legacy-peer-deps
+
+🧠 Key Concepts Learned
+Difference between localhost inside container vs host machine
+Docker build vs Docker run
+Port mapping (host:container)
+Why frontend apps require --host inside containers
+Debugging Docker build and runtime issues
+📌 Status
+
+✅ Day 7 Completed
+✔ Backend containerized
+✔ Frontend containerized
+✔ Docker images created
+✔ Containers running successfully
+
+🐳 Day 8 — Docker Compose (Multi-Container Setup)
+
+✅ Features Implemented
+
+⚙️ Docker Compose Setup
+Created docker-compose.yml
+Defined services:
+mongo
+backend
+frontend
+
+🗄️ MongoDB Integration
+Used official MongoDB image (mongo:7)
+Configured persistent storage using volume:
+mongo_data:/data/db
+
+🔗 Service Communication
+Connected backend to MongoDB using service name:
+mongodb://mongo:27017/food_ordering_devops
+Replaced localhost with mongo for container communication
+
+⚙️ Backend Configuration
+Used build: instead of image: for development
+Passed environment variables using Docker Compose
+Verified MongoDB connection inside container
+
+🎨 Frontend Integration
+Added frontend service to Docker Compose
+Built frontend using Docker Compose
+Exposed frontend on port 5173
+Verified frontend communicates with backend APIs
+
+🧪 Full System Execution
+Ran full application using:
+docker compose up --build
+Verified:
+MongoDB container running
+Backend container running
+Frontend container running
+Full application working in browser
+
+🧠 Key Concepts Learned
+Docker Compose basics
+Running multiple containers together
+Service-to-service communication using service names
+Environment variable override in containers
+Difference between build and image
+YAML formatting and indentation rules
+Container naming vs project naming
+
+📌 Status
+
+✅ Day 8 Completed
+✔ MongoDB container running
+✔ Backend connected to MongoDB
+✔ Frontend integrated with backend
+✔ Full system running using Docker Compose
+
 ## 👨‍💻 Author
 
 Anil Yadav
