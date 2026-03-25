@@ -15,6 +15,9 @@ app.get('/', (req, res) => {
   res.send('Backend is running');
 });
 
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'Backend is healthy' });
+});
 app.use('/api/users', userRoutes);
 app.use('/api/menu', menuRoutes);
 app.use('/api/cart', cartRoutes);
