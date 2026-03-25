@@ -33,7 +33,7 @@ jobs:
             # 5. Install frontend deps
             - name: Install frontend dependencies
               working-directory: app/frontend
-              run: npm install
+              run: npm install --legacy-peer-deps
 
             # 6. Run frontend lint
             - name: Frontend lint
