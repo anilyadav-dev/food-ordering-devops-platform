@@ -20,35 +20,68 @@ jobs:
               with:
                   node-version: 20
 
-            # 3. Install backend deps
+            # 3. Configure AWS credentials
+            - name: Configure AWS credentials
+              uses: aws-actions/configure-aws-credentials@v6
+              with:
+                  aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                  aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                  aws-region: ${{ secrets.AWS_REGION }}
+
+            # 4. Login to Amazon ECR
+            - name: Login to Amazon ECR
+              id: login-ecr
+              uses: aws-actions/amazon-ecr-login@v2
+
+            # 5. Install backend deps
             - name: Install backend dependencies
               working-directory: app/backend
               run: npm install
 
-            # 4. Check backend formatting
+            # 6. Check backend formatting
             - name: Backend format check
               working-directory: app/backend
               run: npm run format:check
 
-            # 5. Install frontend deps
+            # 7. Install frontend deps
             - name: Install frontend dependencies
               working-directory: app/frontend
               run: npm install --legacy-peer-deps
 
-            # 6. Run frontend lint
+            # 8. Run frontend lint
             - name: Frontend lint
               working-directory: app/frontend
               run: npm run lint
 
-            # 7. Check frontend formatting
+            # 9. Check frontend formatting
             - name: Frontend format check
               working-directory: app/frontend
               run: npm run format:check
 
-            # 8. Build backend Docker image
+            # 10. Build backend Docker image
             - name: Build backend Docker image
               run: docker build -t backend ./app/backend
 
-            # 9. Build frontend Docker image
+            # 11. Build frontend Docker image
             - name: Build frontend Docker image
               run: docker build -t frontend ./app/frontend
+
+            # 12. Tag backend image
+            - name: Tag backend image
+              run: |
+                  docker tag backend:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/backend:latest
+
+            # 13. Push backend image
+            - name: Push backend image
+              run: |
+                  docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/backend:latest
+
+            # 14. Tag frontend image
+            - name: Tag frontend image
+              run: |
+                  docker tag frontend:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/frontend:latest
+
+            # 15. Push frontend image
+            - name: Push frontend image
+              run: |
+                  docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/frontend:latest
