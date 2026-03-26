@@ -103,7 +103,7 @@ POST /api/users
 
 Example request:
 
-```bash
+````bash
 curl -X POST http://localhost:8080/api/users \
 -H "Content-Type: application/json" \
 -d '{"name":"testing","email":"testing@example.com","password":"123456"}'
@@ -524,7 +524,77 @@ Container naming vs project naming
 ✔ GitHub Actions CI working
 ✔ Docker image build checks passing
 
+## 🚀 Day 10 — AWS ECR Integration (Docker Image Push)
+
+### 📌 Goal
+Integrate AWS ECR with CI pipeline and push Docker images to cloud registry.
+
+---
+
+### 🛠 What I implemented
+
+- Created **AWS ECR repositories**
+  - backend
+  - frontend
+
+- Configured **IAM user with ECR access**
+  - Policy: `AmazonEC2ContainerRegistryFullAccess`
+
+- Added **GitHub Secrets**
+  - `AWS_ACCESS_KEY_ID`
+  - `AWS_SECRET_ACCESS_KEY`
+  - `AWS_REGION`
+  - `AWS_ACCOUNT_ID`
+
+- Updated **GitHub Actions CI pipeline**
+  - Configure AWS credentials
+  - Login to Amazon ECR
+  - Build Docker images
+  - Tag images with ECR URI
+  - Push images to ECR
+
+---
+
+### ⚙️ CI/CD Flow
+
+```text
+Code Push → GitHub Actions → Docker Build → Tag → Push to AWS ECR
+
+
+⸻
+
+🐳 Docker Images in AWS
+
+Service 	 Repository	  Tag
+Backend	    ECR	         latest
+Frontend	  ECR	       latest
+
+🔑 Key Concepts Learned
+	•	CI/CD pipeline with GitHub Actions
+	•	AWS IAM (secure access control)
+	•	Docker image tagging & pushing
+	•	Amazon ECR (container registry)
+	•	Cloud-based image storage
+
+⸻
+
+📦 Output
+
+✔ Backend Docker image pushed to AWS ECR
+✔ Frontend Docker image pushed to AWS ECR
+✔ Fully automated pipeline (build + push)
+
+⸻
+
+🧠 Real-world Use
+
+This setup allows:
+	•	Centralized image storage
+	•	Easy deployment to ECS / Kubernetes
+	•	Scalable cloud deployments
+
+
 ## 👨‍💻 Author
 
 Anil Yadav
-```
+````
