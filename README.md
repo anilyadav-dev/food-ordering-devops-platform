@@ -594,6 +594,44 @@ This setup allows:
 	•	Scalable cloud deployments
 
 
+## 🔵 Terraform (Day 11)
+
+### ✅ What I Implemented
+
+- Setup Terraform project structure
+- Configured AWS provider (us-west-1)
+- Managed existing AWS resources using Terraform import:
+  - ECR (backend, frontend)
+- Created IAM user using Terraform
+- Followed complete Terraform workflow:
+  - terraform init
+  - terraform plan
+  - terraform apply
+
+---
+
+### 🧠 Key Learnings
+
+- Infrastructure as Code using Terraform
+- Difference between Terraform configuration and state
+- How to import existing AWS resources into Terraform
+- Handling AWS permission errors (IAM AccessDenied)
+- Debugging using AWS CLI (`aws sts get-caller-identity`)
+
+---
+
+### ⚙️ Tech Used
+
+- Terraform
+- AWS (ECR, IAM)
+- AWS CLI
+
+---
+
+### 🚀 Outcome
+
+Successfully provisioned and managed AWS infrastructure using Terraform with real-world debugging and permission handling.
+
 ## 👨‍💻 Author
 
 Anil Yadav
