@@ -632,6 +632,139 @@ This setup allows:
 
 Successfully provisioned and managed AWS infrastructure using Terraform with real-world debugging and permission handling.
 
+## ☸️ Kubernetes Deployment (Day 12–15)
+
+This phase focuses on deploying the MERN application into Kubernetes using Minikube with production-like configurations.
+
+---
+
+## 📅 Day 12 — Kubernetes Setup
+
+- Installed Minikube
+- Started local Kubernetes cluster
+- Learned core concepts:
+  - Pods
+  - Services
+
+### Commands used:
+```bash
+minikube start
+kubectl get nodes
+
+Output:
+✔ Kubernetes cluster running locally
+
+Day 13 — Deploy Backend + Frontend
+	•	Created Kubernetes Deployments for:
+	•	backend
+	•	frontend
+	•	Created Services:
+	•	backend-service (ClusterIP)
+	•	frontend-service (NodePort)
+	•	Pulled Docker images from AWS ECR
+	•	Configured imagePullSecrets for private registry
+
+Key Concepts:
+	•	Deployment manages pods
+	•	Service provides stable network access
+	•	NodePort exposes frontend externally
+
+Output:
+
+✔ Application running in Kubernetes
+
+Day 14 — Mongo + Config
+	•	Added MongoDB Deployment and Service inside cluster
+	•	Implemented configuration management:
+
+ConfigMap
+	•	Used to store non-sensitive data
+	•	Example:
+	•	MONGO_URI
+
+Secret
+	•	Used to store sensitive data
+	•	Example:
+	•	JWT_SECRET
+
+Updated backend Deployment:
+	•	Removed hardcoded values
+	•	Loaded config using:
+	•	configMapKeyRef
+	•	secretKeyRef
+
+Output:
+
+✔ Full system integrated inside Kubernetes
+Day 15 — Health Checks + Resource Management
+
+Health Probes
+
+Liveness Probe
+	•	Checks if container is alive
+	•	Restarts container if unhealthy
+
+Readiness Probe
+	•	Ensures app is ready before receiving traffic
+  livenessProbe:
+  httpGet:
+    path: /api/health
+    port: 8080
+
+readinessProbe:
+  httpGet:
+    path: /api/health
+    port: 8080
+
+Resource Limits
+
+Defined CPU and memory limits:
+
+resources:
+  requests:
+    memory: "128Mi"
+    cpu: "250m"
+  limits:
+    memory: "256Mi"
+    cpu: "500m"
+
+  Debugging Performed
+	•	Fixed CrashLoopBackOff due to:
+	•	incorrect probe port (5000 → 8080)
+	•	Adjusted probe timing using:
+	•	initialDelaySeconds
+	•	Verified rollout using:
+kubectl rollout status deployment backend
+
+Output:
+
+✔ Production-like Kubernetes setup with:
+	•	Health monitoring
+	•	Stable deployments
+	•	Resource management
+
+🧪 Verification Commands
+kubectl get pods
+kubectl get services
+
+Test Backend:
+kubectl port-forward service/backend-service 8080:8080
+curl http://localhost:8080/api/health
+
+Test Frontend:
+kubectl port-forward service/frontend-service 3000:5173
+
+Open in browser:
+http://localhost:3000
+
+🧠 Key Learnings
+	•	Kubernetes Deployments and Services
+	•	ConfigMap vs Secret
+	•	Liveness vs Readiness probes
+	•	Debugging container startup issues
+	•	Rolling updates behavior
+	•	Resource limits for production stability
+
 ## 👨‍💻 Author
 
 Anil Yadav
