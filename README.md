@@ -842,6 +842,17 @@ Traffic routing using NGINX Ingress
 CI/CD automation using Jenkins
 Event-driven deployment via GitHub Webhooks
 
+## 🔔 GitHub Webhook Auto Trigger for Jenkins
+
+To automate deployment on every code push, I connected **GitHub Webhooks** with **Jenkins**.
+
+### What was configured
+- Enabled **GitHub hook trigger for GITScm polling** in Jenkins pipeline
+- Exposed local Jenkins using **ngrok**
+- Added GitHub webhook:
+  ```text
+  https://<ngrok-url>/github-webhook/
+
 ## 👨‍💻 Author
 
 Anil Yadav
