@@ -66,30 +66,36 @@ jobs:
             - name: Build frontend Docker image
               run: docker build -t frontend ./app/frontend
 
-            # ✅ 12. Set commit SHA tag
+            # 12. Set commit SHA tag
             - name: Set image tag
               run: echo "IMAGE_TAG=${GITHUB_SHA::7}" >> $GITHUB_ENV
 
-            # ✅ 13. Tag backend image (latest + SHA)
+            # 13. Tag backend image (latest + SHA)
             - name: Tag backend image
               run: |
                   docker tag backend:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/backend:latest
                   docker tag backend:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/backend:${IMAGE_TAG}
 
-            # ✅ 14. Push backend image
+            # 14. Push backend image
             - name: Push backend image
               run: |
                   docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/backend:latest
                   docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/backend:${IMAGE_TAG}
 
-            # ✅ 15. Tag frontend image (latest + SHA)
+            # 15. Tag frontend image (latest + SHA)
             - name: Tag frontend image
               run: |
                   docker tag frontend:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/frontend:latest
                   docker tag frontend:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/frontend:${IMAGE_TAG}
 
-            # ✅ 16. Push frontend image
+            # 16. Push frontend image
             - name: Push frontend image
               run: |
                   docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/frontend:latest
                   docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/frontend:${IMAGE_TAG}
+
+            # 17. Trigger Jenkins deploy after successful build and push
+            - name: Trigger Jenkins deploy
+              run: |
+                  curl -X POST "${{ secrets.JENKINS_URL }}/job/mern-devops-pipeline/build" \
+                    --user "${{ secrets.JENKINS_USER }}:${{ secrets.JENKINS_API_TOKEN }}"

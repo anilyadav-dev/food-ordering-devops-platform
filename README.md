@@ -853,6 +853,29 @@ To automate deployment on every code push, I connected **GitHub Webhooks** with 
   ```text
   https://<ngrok-url>/github-webhook/
 
+  🔗 GitHub Actions + Jenkins Integration
+
+Initially, Jenkins was triggered directly by GitHub Webhooks on every push. That caused a timing issue because Jenkins could start deployment before GitHub Actions finished building and pushing the latest images to AWS ECR.
+
+✅ Final Improved Flow
+GitHub Push
+   ↓
+GitHub Actions (Build + Push Docker images to ECR)
+   ↓
+Trigger Jenkins after success
+   ↓
+Jenkins deploys updated Kubernetes manifests
+🔧 Improvements Made
+Added Jenkins credentials to GitHub Secrets
+Used GitHub Actions to trigger Jenkins after successful build
+Removed dependency on direct webhook timing
+Created a cleaner CI/CD flow between build and deployment
+🔐 Secrets Used
+GitHub Actions Secrets
+JENKINS_URL
+JENKINS_USER
+JENKINS_API_TOKEN
+
 ## 👨‍💻 Author
 
 Anil Yadav
