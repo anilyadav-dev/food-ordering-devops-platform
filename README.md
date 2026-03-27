@@ -765,6 +765,83 @@ http://localhost:3000
 	•	Rolling updates behavior
 	•	Resource limits for production stability
 
+📅 Day 16 — NGINX Ingress Setup
+🔍 Overview
+
+Configured NGINX Ingress Controller to expose the application using a single domain with path-based routing.
+
+⚙️ Implementation
+
+Enabled NGINX Ingress in Minikube:
+
+minikube addons enable ingress
+Created ingress.yaml to route traffic
+Configured routing rules:
+/ → Frontend service
+/api → Backend service
+
+Updated local DNS mapping:
+
+/etc/hosts → foodapp.local
+🌐 Access
+http://foodapp.local
+✅ Outcome
+Single entry point for the application
+Clean routing between frontend and backend
+Production-like architecture using Ingress
+📅 Day 17 — Jenkins CI/CD Pipeline
+🔍 Overview
+
+Implemented a CI/CD pipeline using Jenkins to automate deployment of the MERN application to Kubernetes.
+
+⚙️ Setup
+
+Ran Jenkins using Docker:
+
+docker run -d -p 8081:8080 jenkins/jenkins:lts
+Installed recommended plugins
+Created pipeline job: mern-devops-pipeline
+Connected Jenkins to GitHub repository
+Configured Kubernetes access inside Jenkins using kubeconfig
+🔄 Pipeline Workflow
+GitHub → Jenkins → Kubernetes
+1. Pull Code
+git clone <repo>
+2. Deploy to Kubernetes
+kubectl apply -f infra/k8s/
+3. Restart Deployments
+kubectl rollout restart deployment backend
+kubectl rollout restart deployment frontend
+4. Verify Deployment
+kubectl get pods
+🔁 Rollback Strategy
+
+Implemented automatic rollback on failure:
+
+kubectl rollout undo deployment backend
+kubectl rollout undo deployment frontend
+💡 Benefit
+Ensures system stability
+Prevents downtime during failed deployments
+🔗 GitHub Webhook Integration
+Configured webhook using ngrok to expose local Jenkins
+Enabled auto-trigger on every push event
+GitHub Push → Webhook → Jenkins → Deploy to Kubernetes
+🚀 Final Outcome
+✅ Fully automated CI/CD pipeline
+✅ Deployment triggered on every code push
+✅ Integrated Jenkins with Kubernetes
+✅ Single domain routing using Ingress
+✅ Automatic rollback for failure handling
+🎯 Summary
+
+This phase completes a production-style DevOps pipeline:
+
+Application deployment using Kubernetes
+Traffic routing using NGINX Ingress
+CI/CD automation using Jenkins
+Event-driven deployment via GitHub Webhooks
+
 ## 👨‍💻 Author
 
 Anil Yadav
