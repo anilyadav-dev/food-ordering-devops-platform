@@ -12,6 +12,12 @@ const app = express();
 const collectDefaultMetrics = client.collectDefaultMetrics;
 collectDefaultMetrics();
 
+const httpRequestCounter = new client.Counter({
+  name: 'http_requests_total',
+  help: 'Total number of HTTP requests',
+  labelNames: ['method', 'route', 'status'],
+});
+
 const register = client.register;
 
 app.get('/metrics', async (req, res) => {
@@ -21,6 +27,17 @@ app.get('/metrics', async (req, res) => {
 
 app.use(cors());
 app.use(express.json());
+
+app.use((req, res, next) => {
+  res.on('finish', () => {
+    httpRequestCounter.inc({
+      method: req.method,
+      route: req.route ? req.route.path : req.path,
+      status: res.statusCode,
+    });
+  });
+  next();
+});
 
 app.get('/', (req, res) => {
   res.send('Backend is running');
