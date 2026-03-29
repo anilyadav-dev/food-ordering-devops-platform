@@ -1,3 +1,4 @@
+const client = require('prom-client');
 const cors = require('cors');
 const express = require('express');
 const cartRoutes = require('./routes/cartRoutes');
@@ -7,6 +8,16 @@ const userRoutes = require('./routes/userRoutes');
 const { errorHandler, notFound } = require('./middleware/errorMiddleware');
 
 const app = express();
+
+const collectDefaultMetrics = client.collectDefaultMetrics;
+collectDefaultMetrics();
+
+const register = client.register;
+
+app.get('/metrics', async (req, res) => {
+  res.set('Content-Type', register.contentType);
+  res.end(await register.metrics());
+});
 
 app.use(cors());
 app.use(express.json());
