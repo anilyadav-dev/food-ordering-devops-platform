@@ -43,13 +43,13 @@ app.get('/', (req, res) => {
   res.send('Backend is running');
 });
 
-app.get('/health', (req, res) => {
+app.get('/api/health', (req, res) => {
   res.json({ status: 'Backend is healthy' });
 });
-app.use('/users', userRoutes);
-app.use('/menu', menuRoutes);
-app.use('/cart', cartRoutes);
-app.use('/orders', orderRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/menu', menuRoutes);
+app.use('/api/cart', cartRoutes);
+app.use('/api/orders', orderRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
