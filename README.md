@@ -876,6 +876,9 @@ JENKINS_URL
 JENKINS_USER
 JENKINS_API_TOKEN
 
+Phase 5 Summary:
+Monitoring, alerting, and automation were implemented to simulate real production environments, enabling system observability, proactive issue detection, and automated infrastructure setup.
+
 ## 👨‍💻 Author
 
 Anil Yadav
