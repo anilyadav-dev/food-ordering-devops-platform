@@ -19,3 +19,15 @@ crash.log
 terraform.tfvars
 *.tfvars
 .terraform.lock.hcl
+
+# Logs
+*.log
+
+# PID files
+*.pid
+
+# DevOps runtime files
+ngrok.log
+ngrok.pid
+minikube-tunnel.log
+minikube-tunnel.pid

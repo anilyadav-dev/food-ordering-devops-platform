@@ -1,0 +1,54 @@
+#!/bin/bash
+
+set -e
+
+echo "======================================"
+echo "Stopping Food Ordering App (Docker)"
+echo "======================================"
+
+PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$PROJECT_ROOT"
+
+NGROK_PID_FILE="$PROJECT_ROOT/ngrok.pid"
+
+echo ""
+echo "1. Stopping Docker Compose services..."
+docker compose down || true
+echo "✅ Docker services stopped"
+
+echo ""
+echo "2. Stopping Jenkins container..."
+if docker ps --format '{{.Names}}' | grep -q '^jenkins$'; then
+  docker stop jenkins
+  echo "✅ Jenkins stopped"
+else
+  echo "ℹ️ Jenkins already stopped"
+fi
+
+echo ""
+echo "3. Stopping ngrok..."
+if [ -f "$NGROK_PID_FILE" ]; then
+  NGROK_PID=$(cat "$NGROK_PID_FILE")
+
+  if ps -p "$NGROK_PID" >/dev/null 2>&1; then
+    kill "$NGROK_PID" || true
+    echo "✅ ngrok stopped (PID: $NGROK_PID)"
+  else
+    echo "ℹ️ ngrok process not running"
+  fi
+
+  rm -f "$NGROK_PID_FILE"
+else
+  echo "ℹ️ No ngrok PID file found"
+fi
+
+echo ""
+echo "4. Final cleanup check..."
+
+echo "Docker containers:"
+docker ps
+
+echo ""
+echo "======================================"
+echo "Docker app stopped successfully ✅"
+echo "======================================"

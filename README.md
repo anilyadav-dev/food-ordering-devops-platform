@@ -2,6 +2,18 @@
 
 This is a full-stack food ordering application built to practice real-world DevOps skills.
 
+## 🧪 Project Type
+
+This is a **production-style DevOps project** designed to simulate real-world workflows including CI/CD, container orchestration, monitoring, and infrastructure automation.
+
+User → NGINX → Frontend → Backend → MongoDB
+↓
+Prometheus → Grafana
+↓
+Jenkins → Kubernetes
+↓
+GitHub Actions → ECR
+
 ---
 
 ## 🚀 Project Goal

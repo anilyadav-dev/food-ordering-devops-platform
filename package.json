@@ -1,12 +1,17 @@
 {
-  "name": "food-ordering-devops-platform",
-  "private": true,
-  "scripts": {
-    "prepare": "husky",
-    "format": "npm --prefix app/frontend run format && npm --prefix app/backend run format",
-    "format:check": "npm --prefix app/frontend run format:check && npm --prefix app/backend run format:check"
-  },
-  "devDependencies": {
-    "husky": "^9.1.7"
-  }
+    "name": "food-ordering-devops-platform",
+    "private": true,
+    "scripts": {
+        "start:docker": "bash ./scripts/start-docker.sh",
+        "stop:docker": "bash ./scripts/stop-docker.sh",
+        "start:k8s": "bash ./scripts/start-k8s.sh",
+        "stop:k8s": "bash ./scripts/stop-k8s.sh",
+        "stop:all": "bash ./scripts/stop-all.sh",
+        "prepare": "husky",
+        "format": "npm --prefix app/frontend run format && npm --prefix app/backend run format",
+        "format:check": "npm --prefix app/frontend run format:check && npm --prefix app/backend run format:check"
+    },
+    "devDependencies": {
+        "husky": "^9.1.7"
+    }
 }
