@@ -11,8 +11,6 @@ cd "$PROJECT_ROOT"
 
 NGROK_LOG="$PROJECT_ROOT/ngrok.log"
 NGROK_PID_FILE="$PROJECT_ROOT/ngrok.pid"
-TUNNEL_LOG="$PROJECT_ROOT/minikube-tunnel.log"
-TUNNEL_PID_FILE="$PROJECT_ROOT/minikube-tunnel.pid"
 
 AWS_REGION="us-west-1"
 AWS_ACCOUNT_ID="673436240700"
@@ -73,23 +71,16 @@ sleep 10
 echo "✅ Ingress controller is ready"
 
 echo ""
-echo "7. Starting Minikube tunnel..."
+echo "7. Minikube tunnel is required for Ingress on macOS."
+echo "👉 Run this in a separate terminal and keep it open:"
+echo "   sudo minikube tunnel"
+echo ""
 
-if [ -f "$TUNNEL_PID_FILE" ]; then
-  OLD_TUNNEL_PID=$(cat "$TUNNEL_PID_FILE")
-  if ps -p "$OLD_TUNNEL_PID" >/dev/null 2>&1; then
-    echo "ℹ️ Stopping old Minikube tunnel process (PID: $OLD_TUNNEL_PID)"
-    kill "$OLD_TUNNEL_PID" || true
-    sleep 2
-  fi
-  rm -f "$TUNNEL_PID_FILE"
-fi
+MINIKUBE_IP=$(minikube ip || true)
 
-nohup minikube tunnel > "$TUNNEL_LOG" 2>&1 &
-TUNNEL_PID=$!
-echo "$TUNNEL_PID" > "$TUNNEL_PID_FILE"
-sleep 10
-echo "✅ Minikube tunnel started in background (PID: $TUNNEL_PID)"
+echo "👉 Make sure /etc/hosts contains:"
+echo "   ${MINIKUBE_IP} foodapp.local"
+echo ""
 
 echo ""
 echo "8. Refreshing ECR pull secret to avoid ImagePullBackOff..."
@@ -238,7 +229,10 @@ echo "Compass (K8s):        mongodb://localhost:27018"
 echo "Jenkins:              http://localhost:8081"
 echo ""
 echo "Hosts file entry needed:"
-echo "127.0.0.1 foodapp.local"
+echo "${MINIKUBE_IP} foodapp.local"
+echo ""
+echo "Manual tunnel command needed:"
+echo "sudo minikube tunnel"
 echo ""
 
 if [ -n "$NGROK_URL" ]; then
@@ -251,7 +245,6 @@ else
 fi
 
 echo ""
-echo "Tunnel log file:      $TUNNEL_LOG"
 echo "ngrok log file:       $NGROK_LOG"
 
 echo ""

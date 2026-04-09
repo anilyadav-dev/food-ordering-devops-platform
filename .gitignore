@@ -10,6 +10,8 @@ node_modules
 
 dist
 **/dist
+build
+coverage
 
 # Terraform
 .terraform/
@@ -22,6 +24,8 @@ terraform.tfvars
 
 # Logs
 *.log
+logs/
+*.log.*
 
 # PID files
 *.pid
@@ -32,4 +36,17 @@ ngrok.pid
 minikube-tunnel.log
 minikube-tunnel.pid
 
-.jenkins/.kube/config
+# Kubernetes local files
+*.kubeconfig
+
+# Jenkins local config
+.jenkins/
+
+# Editor
+.vscode/
+.idea/
+
+# Misc
+*.swp
+*.tmp
+*.bak
