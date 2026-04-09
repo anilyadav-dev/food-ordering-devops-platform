@@ -41,11 +41,11 @@ echo "✅ Minikube stopped"
 
 echo ""
 echo "4. Stopping Jenkins container..."
-if docker ps --format '{{.Names}}' | grep -q '^jenkins$'; then
-  docker stop jenkins
-  echo "✅ Jenkins stopped"
+if docker ps -a --format '{{.Names}}' | grep -q '^jenkins$'; then
+  docker rm -f jenkins >/dev/null 2>&1 || true
+  echo "✅ Jenkins removed"
 else
-  echo "ℹ️ Jenkins already stopped"
+  echo "ℹ️ Jenkins not found"
 fi
 
 echo ""
@@ -68,10 +68,6 @@ fi
 echo ""
 echo "6. Final cleanup check..."
 
-echo "Kubernetes pods:"
-kubectl get pods 2>/dev/null || echo "Cluster not running"
-
-echo ""
 echo "Minikube status:"
 minikube status || true
 

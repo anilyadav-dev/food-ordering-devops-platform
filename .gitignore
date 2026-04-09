@@ -31,3 +31,5 @@ ngrok.log
 ngrok.pid
 minikube-tunnel.log
 minikube-tunnel.pid
+
+.jenkins/.kube/config

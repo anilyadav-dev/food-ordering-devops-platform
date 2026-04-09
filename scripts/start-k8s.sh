@@ -11,7 +11,6 @@ cd "$PROJECT_ROOT"
 
 NGROK_LOG="$PROJECT_ROOT/ngrok.log"
 NGROK_PID_FILE="$PROJECT_ROOT/ngrok.pid"
-
 TUNNEL_LOG="$PROJECT_ROOT/minikube-tunnel.log"
 TUNNEL_PID_FILE="$PROJECT_ROOT/minikube-tunnel.pid"
 
@@ -19,6 +18,7 @@ AWS_REGION="us-west-1"
 AWS_ACCOUNT_ID="673436240700"
 ECR_SECRET_NAME="ecr-secret"
 ECR_SERVER="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+JENKINS_IMAGE="jenkins/jenkins:lts"
 
 echo ""
 echo "1. Checking required tools..."
@@ -133,25 +133,36 @@ echo ""
 kubectl get ingress
 
 echo ""
-echo "13. Starting Jenkins container..."
-if docker ps -a --format '{{.Names}}' | grep -q '^jenkins$'; then
-  if docker ps --format '{{.Names}}' | grep -q '^jenkins$'; then
-    echo "✅ Jenkins already running"
-  else
-    docker start jenkins
-    echo "✅ Jenkins container started"
-  fi
-else
-  docker run -d \
-    --name jenkins \
-    -p 8081:8080 \
-    -p 50000:50000 \
-    jenkins/jenkins:lts
-  echo "✅ Jenkins container created and started"
-fi
+echo "13. Refreshing Jenkins kubeconfig..."
+bash ./scripts/refresh-jenkins-kubeconfig.sh
 
 echo ""
-echo "14. Waiting for Jenkins to be ready..."
+echo "14. Pulling Jenkins image..."
+docker pull "$JENKINS_IMAGE"
+echo "✅ Jenkins image ready"
+
+echo ""
+echo "15. Starting Jenkins container..."
+if docker ps -a --format '{{.Names}}' | grep -q '^jenkins$'; then
+  echo "ℹ️ Recreating Jenkins container to refresh Kubernetes access..."
+  docker rm -f jenkins >/dev/null 2>&1 || true
+fi
+
+docker run -d \
+  --name jenkins \
+  -p 8081:8080 \
+  -p 50000:50000 \
+  --add-host=host.docker.internal:host-gateway \
+  -e KUBECONFIG=/var/jenkins_home/.kube/config \
+  -v jenkins_home:/var/jenkins_home \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v "$PROJECT_ROOT/.jenkins/.kube:/var/jenkins_home/.kube" \
+  "$JENKINS_IMAGE"
+
+echo "✅ Jenkins container created and started"
+
+echo ""
+echo "16. Waiting for Jenkins to be ready..."
 for i in {1..30}; do
   if curl -s http://localhost:8081 >/dev/null 2>&1; then
     echo "✅ Jenkins is reachable"
@@ -162,7 +173,25 @@ for i in {1..30}; do
 done
 
 echo ""
-echo "15. Starting ngrok for Jenkins on port 8081..."
+echo "17. Ensuring kubectl exists inside Jenkins..."
+if docker exec jenkins sh -c 'command -v kubectl >/dev/null 2>&1'; then
+  echo "✅ kubectl already exists inside Jenkins"
+else
+  echo "ℹ️ kubectl not found. Installing inside Jenkins container..."
+  docker exec -u root jenkins bash -lc '
+    apt-get update &&
+    apt-get install -y curl &&
+    curl -fsSL https://dl.k8s.io/release/stable.txt -o /tmp/k8s_version &&
+    K8S_VERSION=$(cat /tmp/k8s_version) &&
+    curl -fsSL "https://dl.k8s.io/release/${K8S_VERSION}/bin/linux/amd64/kubectl" -o /usr/local/bin/kubectl &&
+    chmod +x /usr/local/bin/kubectl &&
+    rm -f /tmp/k8s_version
+  '
+  echo "✅ kubectl installed inside Jenkins"
+fi
+
+echo ""
+echo "18. Starting ngrok for Jenkins on port 8081..."
 
 if [ -f "$NGROK_PID_FILE" ]; then
   OLD_PID=$(cat "$NGROK_PID_FILE")
@@ -180,7 +209,7 @@ echo "$NGROK_PID" > "$NGROK_PID_FILE"
 echo "✅ ngrok started in background (PID: $NGROK_PID)"
 
 echo ""
-echo "16. Waiting for ngrok public URL..."
+echo "19. Waiting for ngrok public URL..."
 NGROK_URL=""
 for i in {1..20}; do
   NGROK_URL=$(curl -s http://127.0.0.1:4040/api/tunnels | sed -n 's/.*"public_url":"\(https:[^"]*\)".*/\1/p' | head -n 1)
@@ -192,7 +221,15 @@ for i in {1..20}; do
 done
 
 echo ""
-echo "17. Final access info"
+echo "20. Verifying Jenkins cluster access..."
+if docker exec jenkins kubectl get nodes >/dev/null 2>&1; then
+  echo "✅ Jenkins can reach Kubernetes"
+else
+  echo "⚠️ Jenkins cluster access check failed"
+fi
+
+echo ""
+echo "21. Final access info"
 echo "--------------------------------------"
 echo "K8s frontend:         http://foodapp.local"
 echo "K8s backend:          http://foodapp.local/api"
