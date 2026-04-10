@@ -7,7 +7,7 @@ function HomePage() {
   return (
     <section className="hero-card">
       <div className="hero-copy">
-        <p className="eyebrow">Modern Food Ordering App</p>
+        <p className="eyebrow">Food Ordering App</p>
         <h1>Designed full-stack frontend for DevOps platform</h1>
         <p className="hero-text">
           Browse menu items, manage your cart, place orders, review order
