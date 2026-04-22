@@ -34,14 +34,18 @@ spec:
                       httpGet:
                           path: /api/health
                           port: 8080
-                      initialDelaySeconds: 30
+                      initialDelaySeconds: 60
                       periodSeconds: 10
+                      timeoutSeconds: 5
+                      failureThreshold: 5
                   readinessProbe:
                       httpGet:
                           path: /api/health
                           port: 8080
-                      initialDelaySeconds: 20
+                      initialDelaySeconds: 40
                       periodSeconds: 5
+                      timeoutSeconds: 5
+                      failureThreshold: 5
                   resources:
                       requests:
                           memory: "128Mi"
