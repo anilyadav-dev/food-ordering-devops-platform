@@ -34,7 +34,18 @@ pipeline {
             }
         }
 
-        stage('Deploy to Kubernetes') {
+        stage('Apply Kubernetes Manifests') {
+            steps {
+                sh '''
+                    kubectl apply -f infra/k8s/backend-deployment.yaml
+                    kubectl apply -f infra/k8s/frontend-deployment.yaml
+                    kubectl apply -f infra/k8s/backend-service.yaml
+                    kubectl apply -f infra/k8s/frontend-service.yaml
+                '''
+            }
+        }
+
+        stage('Deploy Images') {
             steps {
                 sh """
                     kubectl set image deployment/backend backend=${BACKEND_IMAGE}
@@ -46,8 +57,8 @@ pipeline {
         stage('Verify Deployment') {
             steps {
                 sh '''
-                    kubectl rollout status deployment/backend --timeout=180s
-                    kubectl rollout status deployment/frontend --timeout=180s
+                    kubectl rollout status deployment/backend --timeout=300s
+                    kubectl rollout status deployment/frontend --timeout=300s
                     kubectl get pods
                 '''
             }
