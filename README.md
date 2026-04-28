@@ -1,5 +1,11 @@
 # Food Ordering DevOps Platform
 
+## 🎬 Live DevOps Demo (End-to-End CI/CD Pipeline)
+
+This project showcases a production-ready DevOps pipeline where code is automatically built, tested, and deployed to Kubernetes using GitHub Actions, AWS ECR, and Jenkins, with monitoring via Prometheus and Grafana.
+
+[![Watch Demo](https://img.youtube.com/vi/TT0XkaqRb-Y/0.jpg)](https://www.youtube.com/watch?v=TT0XkaqRb-Y)
+
 This is a full-stack food ordering application built to practice real-world DevOps skills.
 
 ## 🧪 Project Type
