@@ -10,15 +10,48 @@ This is a full-stack food ordering application built to practice real-world DevO
 
 ## 🧪 Project Type
 
-This is a **production-style DevOps project** designed to simulate real-world workflows including CI/CD, container orchestration, monitoring, and infrastructure automation.
+## 🚀 Key Highlights
 
-User → NGINX → Frontend → Backend → MongoDB
-↓
-Prometheus → Grafana
-↓
-Jenkins → Kubernetes
-↓
-GitHub Actions → ECR
+- End-to-end CI/CD pipeline (GitHub Actions → ECR → Jenkins → Kubernetes)
+- Kubernetes deployment with health checks and scaling
+- Infrastructure as Code using Terraform
+- Monitoring with Prometheus & Grafana
+- Automated setup using Bash + Ansible
+
+                  User
+                   │
+                   ▼
+                NGINX
+                   │
+                   ▼
+               Frontend
+                   │
+                   ▼
+               Backend
+                   │
+                   ▼
+                MongoDB
+
+                   │
+                   ▼
+             Prometheus
+                   │
+                   ▼
+               Grafana
+
+                   │
+                   ▼
+                Jenkins
+                   │
+                   ▼
+              Kubernetes
+
+                   │
+                   ▼
+         GitHub Actions
+                   │
+                   ▼
+                  ECR
 
 ---
 
